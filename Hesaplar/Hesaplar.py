@@ -2,9 +2,7 @@ import sqlite3
 baglan = sqlite3.connect("hesaplar.db")
 imlec = baglan.cursor()
 
-print("\033[92m" + """        
-      #Iced Fire Tarafından Hazırlanmıştır#
-      
+print("\033[92m" + """
       FONKSİYONLAR : 
       0)FONKSİYONLAR LİSTESİNİ ÇAĞIR
       1)HESAP BİLGİLERİ EKLE
@@ -12,12 +10,12 @@ print("\033[92m" + """
       3)HESAP BİLGİLERİNİ GÜNCELLE
       4)HESAP BİLGİLERİNİ SİL
       5)HESAP BİLGİLERİNİ YEDEKLE
-      6)ÇIKIŞ YAP      
+      6)ÇIKIŞ YAP
 """)
 
 def tablo_olustur():
     imlec.execute("CREATE TABLE IF NOT EXISTS hesaplar (hesapadı TEXT,id TEXT,parola TEXT)")
-    imlec.execute("CREATE TABLE IF NOT EXISTS sahip (isim TEXT ,soyisim TEXT)")
+    imlec.execute("CREATE TABLE IF NOT EXISTS sahip (isim TEXT ,şifre TEXT)")
     baglan.commit()  
     
 def sahip_bilgileri():
@@ -25,15 +23,20 @@ def sahip_bilgileri():
     bilgi = imlec.fetchall()    
     if bilgi == [] :        
         isim = str(input("İsminiz : "))
-        soyisim = str(input("Soyisminiz : "))
-        imlec.execute("INSERT INTO sahip VALUES (?,?)",(isim,soyisim))
+        şifre = str(input("Şifre : "))
+        imlec.execute("INSERT INTO sahip VALUES (?,?)",(isim,şifre))
         baglan.commit()
     else:
         imlec.execute("SELECT isim FROM sahip")
         isim = imlec.fetchall()
         isim = str(isim[0])        
         isim = isim.replace("(","").replace("'","").replace(")","").replace(",","")     
-        print("Hoşgeldin : " + isim + "\n")   
+        print("Hoşgeldin : " + isim + "\n")
+        girilenşifre = (input("Şifre : "))
+        if girilenşifre != imlec.execute("SELECT soyisim FROM sahip"):
+            print("Şifreyi YANLIŞ Girdiniz")
+            baglan.close()
+            exit()                    
 
 def hesap_ekle():
     a=str(input("Hesap Nerede ? :"))
@@ -71,6 +74,9 @@ def yedek():
     dosya_olustur.write(yedek_veri)
     print("Yedek Oluşturuldu ... \n")
     dosya_olustur.close()
+    
+def parolayıdegistir():
+    imlec.execute("UPDATE sahip SET şifre=? WHERE id=?", ("","Ömer Faruk"))
     
 tablo_olustur()
 sahip_bilgileri()
@@ -113,4 +119,3 @@ while True:
     else :
         print("Hatalı Fonksiyon İstediniz ... \n")
         talep=int(input("Ne Yapmak İstiyorsunuz(Numaraları Giriniz) :"))
-
